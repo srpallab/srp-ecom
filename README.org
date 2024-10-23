@@ -1,0 +1,40 @@
+#+title: Wordpress Learning
+#+author: Md. Shafiqur Rahman
+#+options: h:1 num:nil toc:nil
+
+* Action And Filter
+- Allow developers to determine exactly when to run functions
+- Can be at any point, from adding a user, or creating a post
+- Actoins allow developers to write functions that cause somting to
+  happend when something else happens
+- Filter allows developers to menupulate data or content
+- Actions let us do something when WrdPress dose something, that it
+  provides a hook for.
+
+* Different Types Of HTTP Request In WordPress
+** Inside of WordPress
+WordPress Themes and Plugins have access to libraries in WordPress
+Core that help with HTTP requests using JavaScript and PHP. 
+** Outside of WordPress
+Decoupled projects can use JavaScript fetch or library of choice for
+language needed. Some libraries help specifically with WP API.
+* Ways To Make HTTP Requests
+** Inside of WordPress
+- Backbone JavaScript Client
+- WP HTTP API (PHP)
+- WP CLI (Command Line)
+** Outside of WordPress
+- Browser, Postman
+- JavaScript (Fetch, jQuery AJAX)
+- JavaScript WP API Client
+- PHP (Requests, Guzzle, Curl)
+- Command Line (HTTPie, Curl)
+- Flutter, Etc
+* Backbone Library For The WordPress REST API or "WP-API"
+** Using
+Activate the WP-API plugin. Enqueue the script directly:
+#+begin_src php
+  wp_enqueue_script('wp-api');
+  wp_enqueue_script('my_script', 'path/to/my/script', array('wp-api') );
+#+end_src
+* 

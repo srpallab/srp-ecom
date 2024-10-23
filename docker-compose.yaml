@@ -1,0 +1,79 @@
+services:
+  nginx:
+    image: nginx:1.27.1-alpine
+    container_name: ${CONTAINER_NAME}_nginx
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "5010:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:rw
+      - wordpress:/var/www/html
+    networks:
+      - internal
+
+  database:
+    container_name: ${CONTAINER_NAME}_database
+    image: mysql:8.0.32
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DATABASE_USER}", "-p${DATABASE_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql:rw
+    networks:
+      - internal
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ${CONTAINER_NAME}_phpmyadmin
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+    ports:
+      - "5555:80"
+    networks:
+      - internal
+
+  wordpress:
+    depends_on: 
+      - database
+    container_name: ${CONTAINER_NAME}_wordpress
+    image: wordpress:6.6.2-fpm-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_NAME: '${DATABASE_NAME}'
+      WORDPRESS_DB_USER: '${DATABASE_USER}'
+      WORDPRESS_DB_PASSWORD: '${DATABASE_PASSWORD}'
+    volumes:
+      - wordpress:/var/www/html
+      - ./src:/var/www/html/wp-content:rw
+    networks:
+      - internal
+
+      
+
+volumes:
+  dbdata:
+  wordpress:
+
+
+networks:
+  internal:
+    driver: bridge
